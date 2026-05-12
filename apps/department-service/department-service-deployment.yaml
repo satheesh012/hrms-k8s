@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: department-service
-          image: satheesh012/department-service:b131b25daeb79a5f0bb0965d9f1ad923367534f9
+          image: satheesh012/department-service:ae8f5d695c35e564f6b371177b57d8008d2134d1
           imagePullPolicy: Always
           ports:
             - containerPort: 8083
