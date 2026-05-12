@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: attendance-service
+  namespace: hrms
 
 spec:
   replicas: 1
@@ -28,7 +29,7 @@ spec:
     spec:
       containers:
         - name: attendance-service
-          image: satheesh012/attendance-service:IMAGE_TAG
+          image: satheesh012/attendance-service:b131b25daeb79a5f0bb0965d9f1ad923367534f9
           imagePullPolicy: Always
 
           ports:

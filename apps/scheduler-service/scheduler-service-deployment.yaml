@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: scheduler-service
+  namespace: hrms
 spec:
   replicas: 1
   strategy:
@@ -22,7 +23,7 @@ spec:
     spec:
       containers:
         - name: scheduler-service
-          image: satheesh012/scheduler-service:IMAGE_TAG
+          image: satheesh012/scheduler-service:b131b25daeb79a5f0bb0965d9f1ad923367534f9
           imagePullPolicy: Always
           ports:
             - containerPort: 8088

@@ -3,6 +3,7 @@ kind: HorizontalPodAutoscaler
 
 metadata:
   name: employee-service-hpa
+  namespace: hrms
 
 spec:
   scaleTargetRef:
