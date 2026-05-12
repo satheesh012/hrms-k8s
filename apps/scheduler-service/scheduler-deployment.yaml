@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler-service
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: scheduler-service
+  template:
+    metadata:
+      labels:
+        app: scheduler-service
+        tier: backend
+    spec:
+      containers:
+        - name: scheduler-service
+          image: satheesh012/scheduler-service:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8088
+
+          env:
+
+            # Server
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: SERVER_PORT
+
+            - name: SPRING_APPLICATION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: SPRING_APPLICATION_NAME
+
+            # Mail config
+            - name: SPRING_MAIL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: SPRING_MAIL_HOST
+
+            - name: SPRING_MAIL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: SPRING_MAIL_PORT
+
+            - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+
+            - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+
+            # Eureka
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+
+            # Cron jobs
+            - name: CRON_PAYROLL
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: CRON_PAYROLL
+
+            - name: CRON_ATTENDANCE_DAILY
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: CRON_ATTENDANCE_DAILY
+
+            - name: CRON_ATTENDANCE_WEEKLY
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: CRON_ATTENDANCE_WEEKLY
+
+            - name: CRON_REMINDERS_LEAVES
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: CRON_REMINDERS_LEAVES
+
+            # Logging
+            - name: LOGGING_LEVEL_ORG_SPRING_CLOUD_OPENFEIGN
+              valueFrom:
+                configMapKeyRef:
+                  name: scheduler-config
+                  key: LOGGING_LEVEL_ORG_SPRING_CLOUD_OPENFEIGN
+
+            # Mail credentials (SECRET)
+            - name: SPRING_MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: scheduler-secret
+                  key: SPRING_MAIL_USERNAME
+
+            - name: SPRING_MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scheduler-secret
+                  key: SPRING_MAIL_PASSWORD
+                  
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8088
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8088
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8088
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false

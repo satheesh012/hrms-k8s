@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS authService;
+    CREATE DATABASE IF NOT EXISTS attendanceService;
+    CREATE DATABASE IF NOT EXISTS employeeService;
+    CREATE DATABASE IF NOT EXISTS departmentService;
+    CREATE DATABASE IF NOT EXISTS leaveService;
+    CREATE DATABASE IF NOT EXISTS payrollService;
