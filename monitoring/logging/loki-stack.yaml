@@ -39,6 +39,32 @@ spec:
       targetPort: 3100
 
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: promtail-config
+  namespace: logging
+
+data:
+  promtail.yaml: |
+    server:
+      http_listen_port: 9080
+
+    positions:
+      filename: /tmp/positions.yaml
+
+    clients:
+      - url: http://loki:3100/loki/api/v1/push
+
+    scrape_configs:
+      - job_name: kubernetes-pods
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: varlogs
+              __path__: /var/log/*.log
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -61,7 +87,14 @@ spec:
           volumeMounts:
             - name: varlog
               mountPath: /var/log
+              
+            - name: promtail-config
+              mountPath: /etc/promtail
       volumes:
         - name: varlog
           hostPath:
             path: /var/log
+            
+        - name: promtail-config
+          configMap:
+          name: promtail-config
