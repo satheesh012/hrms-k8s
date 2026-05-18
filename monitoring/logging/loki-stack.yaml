@@ -94,8 +94,7 @@ spec:
               mountPath: /var/log
 
             - name: promtail-config
-              mountPath: /etc/promtail/promtail.yaml
-              subPath: promtail.yaml
+              mountPath: /etc/promtail
 
       volumes:
         - name: varlog
