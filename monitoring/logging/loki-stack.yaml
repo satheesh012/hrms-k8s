@@ -62,8 +62,8 @@ data:
           - targets:
               - localhost
             labels:
-              job: varlogs
-              __path__: /var/log/pods/*/*/*.log
+              job: hrms
+              __path__: /var/log/pods/hrms_*/*/*.log
 ---
 apiVersion: apps/v1
 kind: DaemonSet
