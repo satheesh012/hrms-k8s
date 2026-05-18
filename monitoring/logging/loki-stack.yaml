@@ -63,7 +63,7 @@ data:
               - localhost
             labels:
               job: varlogs
-              __path__: /var/log/*.log
+              __path__: /var/log/pods/*/*/*.log
 ---
 apiVersion: apps/v1
 kind: DaemonSet
