@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: leave-service
-          image: satheesh012/leave-service:ae8f5d695c35e564f6b371177b57d8008d2134d1
+          image: satheesh012/leave-service:5b0d076bfabd62c4041522731c8ec8367f516bcd
           imagePullPolicy: Always
           ports:
             - containerPort: 8085
