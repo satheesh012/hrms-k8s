@@ -1,0 +1,59 @@
+replicaCount: 1
+
+tier: backend
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: Always
+
+port: 8080
+
+service:
+  type: ClusterIP
+  port: ~
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "768Mi"
+
+probes:
+  startup:
+    path: /actuator/health
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 60
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Key-value pairs for ConfigMap
+config: {}
+
+# Secret references
+secretEnv:
+  secretName: mysql-secret
+  keys:
+    SPRING_DATASOURCE_PASSWORD: SPRING_DATASOURCE_PASSWORD
+
+# Additional environment variables
+extraEnv: []
