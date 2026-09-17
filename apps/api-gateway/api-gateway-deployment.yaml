@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: satheesh012/api-gateway:db6b2529b72c7142f0b55b3122002081cca0deac
+          image: satheesh012/api-gateway:9c70ca58e2dbfd3d82e8201b009cd01a6410e3d9
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
