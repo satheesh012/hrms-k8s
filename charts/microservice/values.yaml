@@ -49,11 +49,8 @@ probes:
 # Key-value pairs for ConfigMap
 config: {}
 
-# Secret references
-secretEnv:
-  secretName: mysql-secret
-  keys:
-    SPRING_DATASOURCE_PASSWORD: SPRING_DATASOURCE_PASSWORD
+# Secret references (enabled per service when needed)
+secretEnv: {}
 
 # Additional environment variables
 extraEnv: []

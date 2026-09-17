@@ -1,13 +1,13 @@
-fullnameOverride: department-service
+fullnameOverride: employee-service
 
-port: 8083
+port: 8082
 
 image:
-  repository: satheesh012/department-service
+  repository: satheesh012/employee-service
   tag: db6b2529b72c7142f0b55b3122002081cca0deac
 
 config:
-  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/departmentService
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/employeeService
   SPRING_DATASOURCE_USERNAME: root
   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka
   SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
@@ -17,3 +17,9 @@ secretEnv:
   secretName: mysql-secret
   keys:
     SPRING_DATASOURCE_PASSWORD: SPRING_DATASOURCE_PASSWORD
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70

@@ -1,0 +1,13 @@
+fullnameOverride: api-gateway
+
+port: 8080
+
+service:
+  port: 80
+
+image:
+  repository: satheesh012/api-gateway
+  tag: db6b2529b72c7142f0b55b3122002081cca0deac
+
+config:
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka

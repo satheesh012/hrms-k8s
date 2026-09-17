@@ -1,0 +1,36 @@
+fullnameOverride: scheduler-service
+
+port: 8088
+
+image:
+  repository: satheesh012/scheduler-service
+  tag: db6b2529b72c7142f0b55b3122002081cca0deac
+
+config:
+  SERVER_PORT: "8088"
+  SPRING_APPLICATION_NAME: scheduler-service
+  SPRING_MAIL_HOST: smtp.gmail.com
+  SPRING_MAIL_PORT: "587"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+  CRON_PAYROLL: "*/30 * * * * ?"
+  CRON_ATTENDANCE_DAILY: "*/30 * * * * ?"
+  CRON_ATTENDANCE_WEEKLY: "*/30 * * * * ?"
+  CRON_REMINDERS_LEAVES: "*/30 * * * * ?"
+  LOGGING_LEVEL_ORG_SPRING_CLOUD_OPENFEIGN: DEBUG
+
+secret:
+  name: scheduler-secret
+  data:
+    SPRING_MAIL_USERNAME: satheeshprabhu012@gmail.com
+    SPRING_MAIL_PASSWORD: ejta wuqz oacy ofbl
+
+secrets:
+  - name: SPRING_MAIL_USERNAME
+    secretName: scheduler-secret
+    key: SPRING_MAIL_USERNAME
+  - name: SPRING_MAIL_PASSWORD
+    secretName: scheduler-secret
+    key: SPRING_MAIL_PASSWORD

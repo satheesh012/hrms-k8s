@@ -1,0 +1,32 @@
+fullnameOverride: notification-service
+
+port: 8087
+
+image:
+  repository: satheesh012/notification-service
+  tag: db6b2529b72c7142f0b55b3122002081cca0deac
+
+config:
+  SERVER_PORT: "8087"
+  SPRING_APPLICATION_NAME: notification-service
+  SPRING_MAIL_HOST: smtp.gmail.com
+  SPRING_MAIL_PORT: "587"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka
+  LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: INFO
+  LOGGING_LEVEL_COM_TVM_NOTIFICATION: DEBUG
+
+secret:
+  name: notification-secret
+  data:
+    SPRING_MAIL_USERNAME: satheeshprabhu012@gmail.com
+    SPRING_MAIL_PASSWORD: ejta wuqz oacy ofbl
+
+secrets:
+  - name: SPRING_MAIL_USERNAME
+    secretName: notification-secret
+    key: SPRING_MAIL_USERNAME
+  - name: SPRING_MAIL_PASSWORD
+    secretName: notification-secret
+    key: SPRING_MAIL_PASSWORD

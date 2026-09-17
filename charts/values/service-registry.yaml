@@ -1,0 +1,7 @@
+fullnameOverride: service-registry
+
+port: 8761
+
+image:
+  repository: satheesh012/service-registry
+  tag: db6b2529b72c7142f0b55b3122002081cca0deac

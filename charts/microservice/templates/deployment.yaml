@@ -29,6 +29,7 @@ spec:
           ports:
             - containerPort: {{ .Values.port }}
 
+          {{- if or .Values.config (and .Values.secretEnv .Values.secretEnv.keys) .Values.secrets .Values.extraEnv }}
           env:
             {{- if .Values.config }}
             {{- range $key, $val := .Values.config }}
@@ -40,7 +41,7 @@ spec:
             {{- end }}
             {{- end }}
 
-            {{- if .Values.secretEnv }}
+            {{- if and .Values.secretEnv .Values.secretEnv.keys }}
             {{- range $envName, $secretKey := .Values.secretEnv.keys }}
             - name: {{ $envName }}
               valueFrom:
@@ -50,9 +51,20 @@ spec:
             {{- end }}
             {{- end }}
 
+            {{- if .Values.secrets }}
+            {{- range .Values.secrets }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretName }}
+                  key: {{ .key }}
+            {{- end }}
+            {{- end }}
+
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- end }}
 
           {{- if .Values.probes.startup }}
           startupProbe:
