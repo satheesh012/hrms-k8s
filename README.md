@@ -66,7 +66,7 @@ External ingress traffic is managed through the Kubernetes Ingress-NGINX Control
 
 * **Ingress Configuration:** [`infra/ingress/api-gateway-ingress.yaml`](infra/ingress/api-gateway-ingress.yaml)
 * **Local Domain:** `https://myapp.local`
-* **TLS Secret:** `myapp-tls` (Self-signed development certificates in `infra/ingress/crets/`)
+* **TLS Secret:** `myapp-tls` (Self-signed development certificates in [`infra/ingress/certs/`](infra/ingress/certs/))
 
 ### Traffic Routing Flow:
 ```text
@@ -92,6 +92,7 @@ All application states are declaratively managed through ArgoCD:
 
 * **Self-Healing & Drift Detection:** Prevents manual configuration drift on the cluster by continuously reconciling against the `main` branch.
 * **Automated Pruning:** Automatically garbage-collects orphaned Kubernetes resources upon deletion from Git.
+* **Declarative Manifests:** Root application definitions provided in [`argocd/application.yaml`](argocd/application.yaml) (raw manifests) and [`argocd/helm-application.yaml`](argocd/helm-application.yaml) (Helm values sync).
 
 ---
 
@@ -110,6 +111,9 @@ hrmls-k8s/
 │   ├── payroll-service/
 │   ├── scheduler-service/
 │   └── service-registry/
+├── argocd/                       # Declarative ArgoCD Applications (GitOps Controllers)
+│   ├── application.yaml          # Syncs raw manifests with self-heal and auto-prune
+│   └── helm-application.yaml     # Syncs parameterized Helm chart deployments
 ├── charts/                       # Reusable Parameterized Helm Architecture
 │   ├── microservice/             # Core Chart (Deployment, Service, ConfigMap, HPA, Secret)
 │   │   ├── Chart.yaml
@@ -146,6 +150,27 @@ helm install department-service charts/microservice -f charts/values/department-
 ```bash
 kubectl apply -f infra/ingress/api-gateway-ingress.yaml
 ```
+
+### Deploy via ArgoCD
+```bash
+# Apply root GitOps Application
+kubectl apply -f argocd/application.yaml -n argocd
+```
+
+---
+
+## ⚖️ Engineering Trade-Offs: Local Dev vs. Production Architecture
+
+This project was intentionally optimized to balance **cloud-native patterns** with the **hardware constraints of a local developer environment (Docker Desktop / single-node Kubernetes)**. Below is a detailed breakdown of intentional local design choices versus enterprise production standards:
+
+| Architectural Domain | Local Development Setup (Current) | Production Cloud Architecture (AWS / EKS) | Engineering Rationale |
+| :--- | :--- | :--- | :--- |
+| **Compute & Memory (JVM)** | `requests: 250m / 256Mi`<br>`limits: 1000m / 768Mi` | `requests: 500m / 1.5Gi`<br>`limits: 2000m / 2Gi`<br>+ HPA + PDB | Allocating 1.5GB+ per JVM across 10 microservices, MySQL, Prometheus, and ArgoCD on Docker Desktop triggers immediate node memory exhaustion (`OOMKilled`). Tuned JVMs and Hikari pool timeouts ensure full-stack local viability. |
+| **GitOps Secret Management** | Plaintext `Secret` manifests committed for testing | **Bitnami SealedSecrets** or **External Secrets Operator (ESO)** with AWS Secrets Manager / Vault | Encrypted in Git via asymmetric encryption or fetched at runtime via Kubernetes operator; zero secrets stored in plaintext repository. |
+| **Container Build Strategy** | Multi-stage Dockerfile ([`Department-Service`](https://github.com/satheesh012/hrms-platform/blob/main/Department-Service/Dockerfile)); Runner JAR compilation + JRE runtime image in CI | Multi-stage builds with remote BuildKit layer caching (ECR cache / GitHub Actions cache) or **Kaniko** | Running 10 Maven packaging tasks inside Docker containers blows up local Docker layer cache and disk space; runner-cached compilation accelerates CI cycles. |
+| **ArgoCD Exposure** | `kubectl port-forward svc/argocd-server 8080:443` | AWS ALB Ingress Controller with SSL termination + OIDC / Okta SSO integration | Avoids provisioning unnecessary LoadBalancer IPs or complex local DNS routing while keeping the GitOps control plane isolated. |
+| **Ingress & TLS** | Ingress-NGINX + Self-signed certificates (`myapp-tls`) | AWS Load Balancer Controller + **cert-manager** with Let's Encrypt / AWS ACM | Development certificates allow testing HTTPS termination without public DNS delegation requirements. |
+| **CI/CD Quality Gates** | Targeted Trivy vulnerability scanning; unit test execution decoupled | Automated unit tests + Testcontainers for ephemeral DB testing + blocking Trivy/SonarQube gates | Decoupling heavy database integration tests in initial pipeline iterations prevents free-tier runner concurrency limits. |
 
 ---
 

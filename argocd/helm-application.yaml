@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hrms-department-service-helm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: hrms
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/satheesh012/hrms-k8s.git
+    targetRevision: main
+    path: charts/microservice
+    helm:
+      valueFiles:
+        - ../values/department-service.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hrms
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
